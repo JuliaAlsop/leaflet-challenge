@@ -50,7 +50,6 @@ function createMap(earthquakes) {
   // Define a baseMaps object to hold our base layers
   var baseMaps = {
     "Previous Day Earthquakes": streetmap,
-    //"Dark Map": darkmap
   };
 
   // Create overlay object to hold our overlay layer
@@ -95,7 +94,7 @@ function getColor(d){
   d > 3 ? "#ff9143":
   d > 2 ? "#ffb37e":
   d > 1 ? "#4daf4a":
-           "#4dff]";
+           "#4daf]";
 }
 
 //Change the maginutde of the earthquake by a factor of 25,000 for the radius of the circle. 
@@ -103,3 +102,4 @@ function getRadius(value){
   return value*25000
 }
 
+//sources from trilogy lecture & Geographic info systems:https://gis.stackexchange.com/questions/133630/adding-leaflet-legend
