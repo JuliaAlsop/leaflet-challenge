@@ -8,8 +8,6 @@ d3.json(queryUrl, function(data) {
   
 });
 
-
-
 function createFeatures(earthquakeData) {
 
   // Define a function we want to run once for each feature in the features array
@@ -22,6 +20,14 @@ function createFeatures(earthquakeData) {
   // Create a GeoJSON layer containing the features array on the earthquakeData object
   // Run the onEachFeature function once for each piece of data in the array
   var earthquakes = L.geoJSON(earthquakeData, {
+    pointToLayer: function(feature, latlng) {
+      return new L.CircleMarker(latlng, {
+        radius: 5,
+        color: '#FF0000',
+        opacity: 1
+      });
+    },
+    
     onEachFeature: onEachFeature
   });
 
@@ -40,17 +46,12 @@ function createMap(earthquakes) {
     id: "mapbox/streets-v11",
     accessToken: API_KEY
   });
-  var circle = L.circle([39.11, -105], {
-    color: 'red',
-    fillColor: '#f03',
-    fillOpacity: 0.5,
-    radius: 500
-}).addTo(earthquakes);
+  
   // Define a baseMaps object to hold our base layers
-  //var baseMaps = {
-    //"Street Map": streetmap,
+  var baseMaps = {
+    "Previous Day Earthquakes": streetmap,
     //"Dark Map": darkmap
-  //};
+  };
 
   // Create overlay object to hold our overlay layer
   var overlayMaps = {
@@ -67,10 +68,38 @@ function createMap(earthquakes) {
     layers: [streetmap, earthquakes]
   });
 
-  // Create a layer control
-  // Pass in our baseMaps and overlayMaps
-  // Add the layer control to the map
-  L.control.layers(overlayMaps, {
-    collapsed: false
-  }).addTo(myMap);
+//Create a legend on the bottom left
+var legend = L.control({position: 'bottomright'});
+
+legend.onAdd = function(myMap){
+  var div = L.DomUtil.create('div', 'info legend'),
+    grades = [0, 1, 2, 3, 4, 5],
+    labels = [];
+
+// loop through our density intervals and generate a label with a colored square for each interval
+for (var i = 0; i < grades.length; i++) {
+  div.innerHTML +=
+      '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+      grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
 }
+return div;
+};
+
+legend.addTo(myMap);
+}
+
+//Create color range for the circle diameter 
+function getColor(d){
+  return d > 5 ? "#FF0000":
+  d  > 4 ? "#ff6f08":
+  d > 3 ? "#ff9143":
+  d > 2 ? "#ffb37e":
+  d > 1 ? "#4daf4a":
+           "#4dff]";
+}
+
+//Change the maginutde of the earthquake by a factor of 25,000 for the radius of the circle. 
+function getRadius(value){
+  return value*25000
+}
+
